@@ -26,8 +26,11 @@
             class="item">{{item}}</li>
       </ul>
     </div>
-    <div class="list-fixed" v-show="fixedTitle">
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
       <h5 class="fixed-title">{{fixedTitle}}</h5>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <loading></loading>
     </div>
   </scroll>
 </template>
@@ -35,8 +38,10 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import {getData} from 'common/js/dom'
+  import Loading from 'base/loading/loading'
 
   const ANCHER_H = 18
+  const TITLE_H = 30
 
   export default {
     created() {
@@ -48,7 +53,8 @@
     data() {
       return {
         scrollY : -1,
-        currentIndex :0
+        currentIndex :0,
+        diff : -1 //fixed-title和当前栏目的边界距离
       }
     },
     props: {
@@ -132,15 +138,25 @@
           let h2 = listHeight[i+1]
           if(-newY >=h1 && -newY < h2) {
             this.currentIndex = i
+            this.diff = h2 + newY
             return
           }
         }
         //当滚动到底部且 -newY > 最后一个元素的上限
         this.currentIndex = listHeight.length -2
+      },
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_H) ? newVal - TITLE_H : 0
+        if(this.fixedTop === fixedTop) { //性能优化减少 dom操作
+          return
+        }
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
