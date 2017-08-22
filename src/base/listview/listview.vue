@@ -102,15 +102,22 @@
       },
       scrollY(newY) {
         const listHeight = this.listHeight
-        for(let i = 0;i<listHeight.length; i ++) {
+        //当滚动到顶部
+        if(newY > 0) {
+          this.currentIndex = 0
+          return
+        }
+        //当在中间滚动 -1
+        for(let i = 0;i<listHeight.length -1; i ++) {
           let h1 = listHeight[i]
           let h2 = listHeight[i+1]
-          if(!h2 || (-newY >h1 && -newY < h2)) {
+          if(-newY >=h1 && -newY < h2) {
             this.currentIndex = i
             return
           }
         }
-        this.currentIndex = 0
+        //当滚动到底部且 -newY > 最后一个元素的上限
+        this.currentIndex = listHeight.length -2
       }
     },
     components: {
