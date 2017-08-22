@@ -80,6 +80,16 @@
         this.scrollY = pos.y
       },
       _scrollTo(index) {
+        //解决touchstartbug 排查头尾的无效点击
+        if(!index && index !== 0) return
+        //解决touchmovebug
+        if(index < 0) {
+          index = 0
+        }else if(index > this.listHeight.length -2) {
+          index = this.listHeight.length -2
+        }
+        //-的当前位置上的上限值
+        this.scrollY = -this.listHeight[index]
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index],0)
       },
       _calculateHeight() {
