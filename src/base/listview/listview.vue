@@ -9,7 +9,7 @@
       <li class="list-group" v-for="group in data" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li @click="selectItem(item)" v-for="item in group.items" class="list-group-item">
             <img v-lazy="item.avatar" class="avatar" alt="">
             <span class="name">{{item.name}}</span>
           </li>
@@ -93,6 +93,9 @@
       },
       scroll(pos) {
         this.scrollY = pos.y
+      },
+      selectItem(item) {
+        this.$emit('select',item)
       },
       _scrollTo(index) {
         //解决touchstartbug 排查头尾的无效点击
