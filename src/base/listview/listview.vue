@@ -94,7 +94,7 @@
       scroll(pos) {
         this.scrollY = pos.y
       },
-      selectItem(item) {
+      selectItem(item) { //派发点击事件
         this.$emit('select',item)
       },
       _scrollTo(index) {
