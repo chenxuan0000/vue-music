@@ -7,7 +7,9 @@
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="filter"></div>
     </div>
-    <scroll :data="songs" class="list" ref="list">
+    <div class="bg-layer" ref="layer"></div>
+    <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="ListenScroll" :data="songs" class="list"
+            ref="list">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
       </div>
@@ -18,6 +20,8 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
+
+  const RESERVED_HEIGHT = 40
 
   export default {
     props: {
@@ -34,13 +38,36 @@
         default: ''
       }
     },
+    data() {
+      return {
+        scrollY: 0
+      }
+    },
     computed: {
       bgStyle() {
         return `background-image:url(${this.bgImage})`
       }
     },
+    created() {
+      this.probeType = 3
+      this.ListenScroll = true
+    },
+    methods: {
+      scroll(pos) {
+        this.scrollY = pos.y
+      }
+    },
     mounted() {
-      this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
+      this.imgHeight = this.$refs.bgImage.clientHeight
+      this.minTranslateY = -this.imgHeight + RESERVED_HEIGHT
+      this.$refs.list.$el.style.top = `${this.imgHeight}px`
+    },
+    watch: {
+      scrollY(newY) {
+        let translateY = Math.max(this.minTranslateY,newY)
+        this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
+        this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
+      }
     },
     components: {
       Scroll,
@@ -86,7 +113,6 @@
       position: relative
       width: 100%
       height: 0
-      z-index 10
       padding-top: 70%
       transform-origin: top
       background-size: cover
@@ -122,7 +148,7 @@
         height: 100%
         background: rgba(7, 17, 27, 0.4)
     .bg-layer
-      position: relative
+      /*position: relative*/
       height: 100%
       background: $color-background
     .list
