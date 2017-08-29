@@ -65,8 +65,20 @@
     watch: {
       scrollY(newY) {
         let translateY = Math.max(this.minTranslateY,newY)
+        let zIndex = 0
+        let imageStyle = this.$refs.bgImage.style
+        let Style = this.$refs.bgImage.style
         this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
         this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
+        if(newY < this.minTranslateY) {
+          zIndex = 10
+          imageStyle.paddingTop = 0
+          imageStyle.height = `${RESERVED_HEIGHT}px`
+        }else {
+          imageStyle.paddingTop = '70%'
+          imageStyle.height = 0
+        }
+        imageStyle.zIndex = zIndex
       }
     },
     components: {
