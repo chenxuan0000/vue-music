@@ -5,7 +5,7 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="filter"></div>
+      <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
     <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="ListenScroll" :data="songs" class="list"
@@ -64,21 +64,35 @@
     },
     watch: {
       scrollY(newY) {
-        let translateY = Math.max(this.minTranslateY,newY)
+        let translateY = Math.max(this.minTranslateY, newY)
         let zIndex = 0
+        let scale = 1
+        let blur = 0
         let imageStyle = this.$refs.bgImage.style
+        let layerStyle = this.$refs.layer.style
         let Style = this.$refs.bgImage.style
-        this.$refs.layer.style['transform'] = `translate3d(0,${translateY}px,0)`
-        this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
-        if(newY < this.minTranslateY) {
+        layerStyle['transform'] = `translate3d(0,${translateY}px,0)`
+        layerStyle['webkitTransform'] = `translate3d(0,${translateY}px,0)`
+        const per = Math.abs(newY / this.imgHeight)
+        if (newY > 0) {
+          scale = 1 + per
+          zIndex = 10
+        } else {
+          blur = Math.min(20 * per, 20)
+        }
+        this.$refs.filter.style['backdrop-filter'] = `blur(${blur})px`
+        this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur})px`
+        if (newY < this.minTranslateY) {
           zIndex = 10
           imageStyle.paddingTop = 0
           imageStyle.height = `${RESERVED_HEIGHT}px`
-        }else {
+        } else {
           imageStyle.paddingTop = '70%'
           imageStyle.height = 0
         }
         imageStyle.zIndex = zIndex
+        imageStyle['transform'] = `scale(${scale})`
+        imageStyle['webkitTransform'] = `scale(${scale})`
       }
     },
     components: {
