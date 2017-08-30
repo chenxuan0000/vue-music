@@ -20,8 +20,11 @@
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
+  import {prefixStyle} from 'common/js/dom'
 
   const RESERVED_HEIGHT = 40
+  const transform = prefixStyle('transform')
+  const backdrop = prefixStyle('backdrop-filter')
 
   export default {
     props: {
@@ -71,8 +74,7 @@
         let imageStyle = this.$refs.bgImage.style
         let layerStyle = this.$refs.layer.style
         let Style = this.$refs.bgImage.style
-        layerStyle['transform'] = `translate3d(0,${translateY}px,0)`
-        layerStyle['webkitTransform'] = `translate3d(0,${translateY}px,0)`
+        layerStyle[transform] = `translate3d(0,${translateY}px,0)`
         const per = Math.abs(newY / this.imgHeight)
         if (newY > 0) {
           scale = 1 + per
@@ -81,8 +83,7 @@
           blur = Math.min(20 * per, 20)
         }
         //ios增强高斯模糊
-        this.$refs.filter.style['backdrop-filter'] = `blur(${blur})px`
-        this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur})px`
+        this.$refs.filter.style[backdrop] = `blur(${blur})px`
         if (newY < this.minTranslateY) {
           zIndex = 10
           imageStyle.paddingTop = 0
@@ -92,8 +93,7 @@
           imageStyle.height = 0
         }
         imageStyle.zIndex = zIndex
-        imageStyle['transform'] = `scale(${scale})`
-        imageStyle['webkitTransform'] = `scale(${scale})`
+        imageStyle[transform] = `scale(${scale})`
       }
     },
     components: {
