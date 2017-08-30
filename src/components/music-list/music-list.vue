@@ -1,10 +1,16 @@
 <template>
   <div class="music-list">
-    <div class="back">
+    <div class="back" @click="back">
       <i class="icon-back"></i>
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div class="play" v-show="songs.length>0" ref="playBtn">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
       <div class="filter" ref="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -12,6 +18,9 @@
             ref="list">
       <div class="song-list-wrapper">
         <song-list :songs="songs"></song-list>
+      </div>
+      <div class="loading-container" v-show="!songs.length">
+        <loading></loading>
       </div>
     </scroll>
   </div>
@@ -21,6 +30,7 @@
   import Scroll from 'base/scroll/scroll'
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
+  import loading from 'base/loading/loading'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
@@ -58,6 +68,9 @@
     methods: {
       scroll(pos) {
         this.scrollY = pos.y
+      },
+      back() {
+        this.$router.back()
       }
     },
     mounted() {
@@ -73,7 +86,7 @@
         let blur = 0
         let imageStyle = this.$refs.bgImage.style
         let layerStyle = this.$refs.layer.style
-        let Style = this.$refs.bgImage.style
+        let playStyle = this.$refs.playBtn.style
         layerStyle[transform] = `translate3d(0,${translateY}px,0)`
         const per = Math.abs(newY / this.imgHeight)
         if (newY > 0) {
@@ -88,9 +101,11 @@
           zIndex = 10
           imageStyle.paddingTop = 0
           imageStyle.height = `${RESERVED_HEIGHT}px`
+          playStyle.display = 'none'
         } else {
           imageStyle.paddingTop = '70%'
           imageStyle.height = 0
+          playStyle.display = 'block'
         }
         imageStyle.zIndex = zIndex
         imageStyle[transform] = `scale(${scale})`
@@ -98,7 +113,8 @@
     },
     components: {
       Scroll,
-      SongList
+      SongList,
+      loading
     }
   }
 </script>
