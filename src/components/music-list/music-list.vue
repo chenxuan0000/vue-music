@@ -80,6 +80,7 @@
         } else {
           blur = Math.min(20 * per, 20)
         }
+        //ios增强高斯模糊
         this.$refs.filter.style['backdrop-filter'] = `blur(${blur})px`
         this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur})px`
         if (newY < this.minTranslateY) {
