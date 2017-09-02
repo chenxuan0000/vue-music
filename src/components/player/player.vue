@@ -18,7 +18,7 @@
         </div>
         <div class="middle">
           <div class="middle-l">
-            <div class="cd-wrapper">
+            <div class="cd-wrapper" ref="cdWarpper">
               <div class="cd">
                 <img class="image" :src="currentSong.image">
               </div>
@@ -67,7 +67,9 @@
 <script type="text/ecmascript-6">
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
+  import {prefixStyle} from 'common/js/dom'
 
+  const transform = prefixStyle('transform')
   export default {
     computed: {
       ...mapGetters([
@@ -84,11 +86,11 @@
         this.setFullScreen(true)
       },
       enter(el, done) {
-        const {x,y,scale} = this._getPosAndScale()
+        const {x, y, scale} = this._getPosAndScale()
 
         let animation = {
           0: {
-            transform: `translate3d(${x},${y},0) scale(${scale})`
+            transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
           },
           60: {
             transform: `translate3d(0,0,0) scale(1.1)`
@@ -97,15 +99,30 @@
             transform: `translate3d(0,0,0) scale(1)`
           }
         }
+        animations.registerAnimation({
+          name: 'move',
+          animation,
+          persets: {
+            duration: 400,
+            easing: 'linear'
+          }
+        })
+
+        animations.runAnimation(this.$refs.cdWarpper, 'move', done)
       },
       afterEnter() {
-
+        animations.unregisterAnimation('move')
+        this.$refs.cdWarpper.style.animation = ''
       },
       leave(el, done) {
-
+        this.$refs.cdWarpper.style.transition = 'all 0.4s'
+        const {x, y, scale} = this._getPosAndScale()
+        this.$refs.cdWarpper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
+        this.$refs.cdWarpper.addEventListener('transitionend', done)
       },
       afterLeave() {
-
+        this.$refs.cdWarpper.style.transition = ''
+        this.$refs.cdWarpper.style[transform] = ''
       },
       _getPosAndScale() {
         const targetWidth = 40
