@@ -30,13 +30,13 @@
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
+            <div class="icon i-left" :class="disableCls">
               <i @click="prev" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
+            <div class="icon i-right" :class="disableCls">
               <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
@@ -83,6 +83,9 @@
       cdCls() {
         return this.playing ? 'play' : 'play pause'
       },
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
       },
@@ -108,7 +111,7 @@
         this.songReady = true
       },
       error() {
-
+        this.songReady = true  //网络和歌曲错误导致按钮不可用的处理
       },
       prev() {
         if(!this.songReady) {
@@ -119,7 +122,9 @@
           index = 0
         }
         this.setCurrentIndex(index)
-        if (!this.playing) this.togglePlaying()
+        if (!this.playing) {
+          this.togglePlaying()
+        }
         this.songReady = false
       },
       next() {
@@ -131,7 +136,9 @@
           index = this.playList.length - 1
         }
         this.setCurrentIndex(index)
-        if (!this.playing) this.togglePlaying()
+        if (!this.playing) {
+          this.togglePlaying()
+        }
         this.songReady = false
       },
       togglePlaying() {
