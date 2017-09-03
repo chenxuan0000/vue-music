@@ -26,6 +26,13 @@
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
@@ -63,7 +70,7 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error"></audio>
+    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -71,12 +78,14 @@
   import {mapGetters, mapMutations} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
+  import progressBar from 'base/progress-bar/progress-bar'
 
   const transform = prefixStyle('transform')
   export default {
     data() {
       return {
-        songReady: false
+        songReady: false,
+        currentTime: 0
       }
     },
     computed: {
@@ -91,6 +100,9 @@
       },
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      },
+      percent() {
+        return this.currentTime / this.currentSong.duration
       },
       ...mapGetters([
         'fullScreen',
@@ -113,8 +125,25 @@
       error() {
         this.songReady = true  //网络和歌曲错误导致按钮不可用的处理
       },
+      updateTime(e) {
+        this.currentTime = e.target.currentTime
+      },
+      format(interval) {
+        interval = interval | 0 //向下取整
+        const minute = interval / 60 | 0
+        const second = this._pad(interval % 60)
+        return `${minute}:${second}`
+      },
+      _pad(num, n = 2) {
+        let len = num.toString().length
+        while (len < n) {
+          num = '0' + num
+          len++
+        }
+        return num
+      },
       prev() {
-        if(!this.songReady) {
+        if (!this.songReady) {
           return
         }
         let index = this.currentIndex - 1
@@ -126,9 +155,10 @@
           this.togglePlaying()
         }
         this.songReady = false
-      },
+      }
+      ,
       next() {
-        if(!this.songReady) {
+        if (!this.songReady) {
           return
         }
         let index = this.currentIndex + 1
@@ -140,10 +170,12 @@
           this.togglePlaying()
         }
         this.songReady = false
-      },
+      }
+      ,
       togglePlaying() {
         this.setPlayingState(!this.playing)
-      },
+      }
+      ,
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
 
@@ -168,21 +200,25 @@
         })
 
         animations.runAnimation(this.$refs.cdWarpper, 'move', done)
-      },
+      }
+      ,
       afterEnter() {
         animations.unregisterAnimation('move')
         this.$refs.cdWarpper.style.animation = ''
-      },
+      }
+      ,
       leave(el, done) {
         this.$refs.cdWarpper.style.transition = 'all 0.4s'
         const {x, y, scale} = this._getPosAndScale()
         this.$refs.cdWarpper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
         this.$refs.cdWarpper.addEventListener('transitionend', done)
-      },
+      }
+      ,
       afterLeave() {
         this.$refs.cdWarpper.style.transition = ''
         this.$refs.cdWarpper.style[transform] = ''
-      },
+      }
+      ,
       _getPosAndScale() {
         const targetWidth = 40
         const paddingLeft = 40
@@ -197,25 +233,31 @@
           y,
           scale
         }
-      },
-      ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN',
-        setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
-      })
+      }
+      ,
+      ...
+        mapMutations({
+          setFullScreen: 'SET_FULL_SCREEN',
+          setPlayingState: 'SET_PLAYING_STATE',
+          setCurrentIndex: 'SET_CURRENT_INDEX'
+        })
     },
     watch: {
       currentSong() {
         this.$nextTick(() => {
           this.$refs.audio.play() //需要加dom加载延时
         })
-      },
+      }
+      ,
       playing(newPalying) {
         const audio = this.$refs.audio
         this.$nextTick(() => {
           newPalying ? audio.play() : audio.pause()
         })
       }
+    },
+    components: {
+      progressBar
     }
   }
 
