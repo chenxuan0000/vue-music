@@ -3,11 +3,13 @@ function getRandom(min, max) {
 }
 
 export function shuffle(arr) {
-  for (let i = 0, len = arr.length; i < len; i++) {
+  //复制个副本
+  let _arr = arr.slice()
+  for (let i = 0, len = _arr.length; i < len; i++) {
     let j = getRandom(0, i)
-    let t = arr[i]
-    arr[i] = arr[j]
-    arr[j] = t
+    let t = _arr[i]
+    _arr[i] = _arr[j]
+    _arr[j] = t
   }
-  return arr
+  return _arr
 }
