@@ -72,7 +72,8 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime"></audio>
+    <audio ref="audio" :src="currentSong.url"
+           @ended="end" @play="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
@@ -132,6 +133,17 @@
       },
       ready() {
         this.songReady = true
+      },
+      end() {
+        if(this.mode === playMode.loop) {
+          this.loop()
+        }else {
+          this.next()
+        }
+      },
+      loop() {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
       },
       error() {
         this.songReady = true  //网络和歌曲错误导致按钮不可用的处理

@@ -54,7 +54,11 @@
         this.$emit('percentChange',percent)
       },
       progressClick(e) {
-        this._offset(e.offsetX)
+        const rect = this.$refs.progressBar.getBoundingClientRect()
+        const offsetWidth = e.pageX - rect.left;
+        this._offset(offsetWidth)
+        //此处有bug当点击按钮时无法获取e.offsetX
+        //this._offset(e.offsetX)
         this._tiggerPercent() //通知外部改变音乐进度
       },
       _offset(offsetWidth) {
