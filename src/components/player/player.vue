@@ -83,6 +83,7 @@
   import progressBar from 'base/progress-bar/progress-bar'
   import progressCircle from 'base/progress-circle/progress-circle'
   import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
 
   const transform = prefixStyle('transform')
   export default {
@@ -118,7 +119,8 @@
         'currentSong',
         'playing',
         'currentIndex',
-        'mode'
+        'mode',
+        'sequenceList'
       ])
     },
     methods: {
@@ -136,7 +138,21 @@
       },
       changeMode() {
         const mode = (this.mode + 1) % 3
-        this.setPlayMode(mode);
+        this.setPlayMode(mode)
+        let list = null
+        if (mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+        this.resetCurrentIndex(list);
+        this.setPlayList(list);
+      },
+      resetCurrentIndex(list) {
+        let index = list.findIndex((item) => {
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index);
       },
       onProgressBarChange(per) {
         this.$refs.audio.currentTime = this.currentSong.duration * per
@@ -166,21 +182,6 @@
           return
         }
         let index = this.currentIndex - 1
-        if (index === this.playList.length) {
-          index = 0
-        }
-        this.setCurrentIndex(index)
-        if (!this.playing) {
-          this.togglePlaying()
-        }
-        this.songReady = false
-      }
-      ,
-      next() {
-        if (!this.songReady) {
-          return
-        }
-        let index = this.currentIndex + 1
         if (index === -1) {
           index = this.playList.length - 1
         }
@@ -189,12 +190,24 @@
           this.togglePlaying()
         }
         this.songReady = false
-      }
-      ,
+      },
+      next() {
+        if (!this.songReady) {
+          return
+        }
+        let index = this.currentIndex + 1
+        if (index === this.playList.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
+        this.songReady = false
+      },
       togglePlaying() {
         this.setPlayingState(!this.playing)
-      }
-      ,
+      },
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
 
@@ -217,15 +230,12 @@
             easing: 'linear'
           }
         })
-
         animations.runAnimation(this.$refs.cdWarpper, 'move', done)
-      }
-      ,
+      },
       afterEnter() {
         animations.unregisterAnimation('move')
         this.$refs.cdWarpper.style.animation = ''
-      }
-      ,
+      },
       leave(el, done) {
         this.$refs.cdWarpper.style.transition = 'all 0.4s'
         const {x, y, scale} = this._getPosAndScale()
@@ -236,8 +246,7 @@
       afterLeave() {
         this.$refs.cdWarpper.style.transition = ''
         this.$refs.cdWarpper.style[transform] = ''
-      }
-      ,
+      },
       _getPosAndScale() {
         const targetWidth = 40
         const paddingLeft = 40
@@ -252,18 +261,21 @@
           y,
           scale
         }
-      }
-      ,
+      },
       ...
         mapMutations({
           setFullScreen: 'SET_FULL_SCREEN',
           setPlayingState: 'SET_PLAYING_STATE',
           setCurrentIndex: 'SET_CURRENT_INDEX',
-          setPlayMode: 'SET_PLAY_MODE'
+          setPlayMode: 'SET_PLAY_MODE',
+          setPlayList: 'SET_PLAYLIST'
         })
     },
     watch: {
-      currentSong() {
+      currentSong(newSong, oldSong) {
+        if (newSong.id === oldSong.id) {
+          return
+        }
         this.$nextTick(() => {
           this.$refs.audio.play() //需要加dom加载延时
         })
