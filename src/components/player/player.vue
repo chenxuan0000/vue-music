@@ -24,6 +24,15 @@
               </div>
             </div>
           </div>
+          <div class="middle-r" ref="lyricList">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine"
+                   class="text"
+                   v-for="line in currentLyric.lines">{{line.txt}}</p>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
@@ -85,6 +94,7 @@
   import progressCircle from 'base/progress-circle/progress-circle'
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
+  import Lyric from 'lyric-parser'
 
   const transform = prefixStyle('transform')
   export default {
@@ -92,7 +102,8 @@
       return {
         songReady: false,
         currentTime: 0,
-        radius: 32
+        radius: 32,
+        currentLyric: null
       }
     },
     computed: {
@@ -135,9 +146,9 @@
         this.songReady = true
       },
       end() {
-        if(this.mode === playMode.loop) {
+        if (this.mode === playMode.loop) {
           this.loop()
-        }else {
+        } else {
           this.next()
         }
       },
@@ -174,6 +185,22 @@
       },
       updateTime(e) {
         this.currentTime = e.target.currentTime
+      },
+      getLyric() {
+        this.currentSong.getLyric().then((lyric) => {
+//          if (this.currentSong.lyric !== lyric) {
+//            return
+//          }
+//          this.currentLyric = new Lyric(lyric, this.handleLyric)
+          this.currentLyric = new Lyric(lyric)
+//          if (this.playing) {
+//            this.currentLyric.play()
+//          }
+        }).catch(() => {
+          this.currentLyric = null
+          this.playingLyric = ''
+          this.currentLineNum = 0
+        })
       },
       format(interval) {
         interval = interval | 0 //向下取整
@@ -253,8 +280,7 @@
         const {x, y, scale} = this._getPosAndScale()
         this.$refs.cdWarpper.style[transform] = `translate3d(${x}px,${y}px,0) scale(${scale})`
         this.$refs.cdWarpper.addEventListener('transitionend', done)
-      }
-      ,
+      },
       afterLeave() {
         this.$refs.cdWarpper.style.transition = ''
         this.$refs.cdWarpper.style[transform] = ''
@@ -290,7 +316,9 @@
         }
         this.$nextTick(() => {
           this.$refs.audio.play() //需要加dom加载延时
+          this.getLyric();
         })
+
       }
       ,
       playing(newPalying) {
