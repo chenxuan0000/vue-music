@@ -27,6 +27,9 @@
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -116,7 +119,8 @@
         radius: 32,
         currentLyric: null,
         currentLineNum: 0,
-        currentShow: 'cd'
+        currentShow: 'cd',
+        playingLyric: ''
       }
     },
     created() {
@@ -171,6 +175,9 @@
       loop() {
         this.$refs.audio.currentTime = 0
         this.$refs.audio.play()
+        if (this.currentLyric) {
+          this.currentLyric.seek(0) //单曲循环直接拖拽到结束 歌词不刷新
+        }
       },
       error() {
         this.songReady = true  //网络和歌曲错误导致按钮不可用的处理
@@ -194,9 +201,13 @@
         this.setCurrentIndex(index);
       },
       onProgressBarChange(per) {
-        this.$refs.audio.currentTime = this.currentSong.duration * per
+        const currentTime = this.currentSong.duration * per
+        this.$refs.audio.currentTime = currentTime
         if (!this.playing) {
           this.togglePlaying()
+        }
+        if (this.currentLyric) {
+          this.currentLyric.seek(currentTime * 1000) //拖拽进度条歌词不跟新bug
         }
       },
       updateTime(e) {
@@ -245,13 +256,17 @@
         if (!this.songReady) {
           return
         }
-        let index = this.currentIndex - 1
-        if (index === -1) {
-          index = this.playList.length - 1
-        }
-        this.setCurrentIndex(index)
-        if (!this.playing) {
-          this.togglePlaying()
+        if (this.playList.length === 1) { //处理列表只有一个歌曲的边界情况 不处理无法正常播放
+          this.loop()
+        } else {
+          let index = this.currentIndex - 1
+          if (index === -1) {
+            index = this.playList.length - 1
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
         }
         this.songReady = false
       },
@@ -259,18 +274,25 @@
         if (!this.songReady) {
           return
         }
-        let index = this.currentIndex + 1
-        if (index === this.playList.length) {
-          index = 0
-        }
-        this.setCurrentIndex(index)
-        if (!this.playing) {
-          this.togglePlaying()
+        if (this.playList.length === 1) {
+          this.loop()
+        } else {
+          let index = this.currentIndex + 1
+          if (index === this.playList.length) {
+            index = 0
+          }
+          this.setCurrentIndex(index)
+          if (!this.playing) {
+            this.togglePlaying()
+          }
         }
         this.songReady = false
       },
       togglePlaying() {
         this.setPlayingState(!this.playing)
+        if (this.currentLyric) {
+          this.currentLyric.togglePlay() //解决暂停播放歌词不停问题
+        }
       },
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
@@ -413,10 +435,13 @@
         if (newSong.id === oldSong.id) {
           return
         }
-        this.$nextTick(() => {
+        if (this.currentLyric) {
+          this.currentLyric.stop() //清除之前的定时器
+        }
+        setTimeout(() => { //解决手机浏览器播放后台切到前台来回切换js不执行导致的标志位未释放无法切换的bug
           this.$refs.audio.play() //需要加dom加载延时
           this.getLyric();
-        })
+        },1000)
       },
       playing(newPalying) {
         const audio = this.$refs.audio
