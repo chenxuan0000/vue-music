@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <scroll class="recommend-content" :data="discList" ref="scroll">
       <div ref="aaa">
         <div v-if="recommends.length" class="slider-wrapper">
@@ -39,8 +39,10 @@
   import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
   import loading from 'base/loading/loading'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],   //mixins 类似于公共组件
     data() {
       return {
         recommends: [],
@@ -65,6 +67,11 @@
             this.discList = res.data.list
           }
         })
+      },
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh() //重置scroll位置
       },
       imgHasLoad() {
         if (!this.checkFalg) {

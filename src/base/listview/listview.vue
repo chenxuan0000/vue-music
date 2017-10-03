@@ -97,6 +97,9 @@
       selectItem(item) { //派发点击事件
         this.$emit('select',item)
       },
+      refresh() {
+        this.$refs.listview.refresh()
+      },
       _scrollTo(index) {
         //解决touchstartbug 排查头尾的无效点击
         if(!index && index !== 0) return

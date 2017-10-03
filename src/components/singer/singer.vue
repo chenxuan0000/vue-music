@@ -1,6 +1,6 @@
 <template>
   <div class="singer" ref="singer">
-    <listview @select="selectSinger" :data="singers"></listview>
+    <listview @select="selectSinger" :data="singers" ref="list"></listview>
     <router-view></router-view>
   </div>
 </template>
@@ -11,11 +11,13 @@
   import Singer from 'common/js/singer'
   import listview from 'base/listview/listview'
   import {mapMutations} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const HOT_NAME = '热门'
   const HOT_SINGER_LEN = 10
 
   export default {
+    mixins: [playlistMixin],   //mixins 类似于公共组件
     data() {
       return {
         singers: []
@@ -36,6 +38,11 @@
         if (res.code === ERR_OK) {
           this.singers = this._normalizeSinger(res.data.list)
         }
+      },
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.singer.style.bottom = bottom
+        this.$refs.list.refresh() //重置scroll位置
       },
       _normalizeSinger(list) {
         let map = {

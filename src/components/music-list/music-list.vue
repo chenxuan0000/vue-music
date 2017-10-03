@@ -32,12 +32,14 @@
   import {prefixStyle} from 'common/js/dom'
   import loading from 'base/loading/loading'
   import {mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
   const backdrop = prefixStyle('backdrop-filter')
 
   export default {
+    mixins: [playlistMixin],   //mixins 类似于公共组件
     props: {
       bgImage: {
         type: String,
@@ -78,6 +80,11 @@
           list: this.songs,
           index
         })
+      },
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh() //重置scroll位置
       },
       random() {
         this.randomPlay({
