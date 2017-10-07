@@ -1,39 +1,60 @@
 <template>
   <div class="rank" ref="rank">
-    <div class="toplist" ref="toplist">
+    <scroll :data="topList" class="toplist" ref="topList">
       <ul>
-        <li class="item" >
+        <li class="item" v-for="item in topList">
           <div class="icon">
-            <img width="100" height="100"/>
+            <img width="100" height="100" v-lazy="item.picUrl"/>
           </div>
           <ul class="songlist">
-            <li class="song">
-              <span></span>
-              <span></span>
+            <li class="song" v-for="(song,index) in item.songList">
+              <span>{{index + 1}}</span>
+              <span>{{song.songname}}-{{song.singername}}</span>
             </li>
           </ul>
         </li>
       </ul>
-    </div>
+      <div class="loading-container" v-show="!topList.length">
+        <loading></loading>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import {getTopList} from 'api/rank'
   import {ERR_OK} from 'api/config'
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],   //mixins 类似于公共组件
     created() {
       this._getTopList()
     },
+    data() {
+      return {
+        topList: []
+      }
+    },
     methods: {
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.rank.style.bottom = bottom
+        this.$refs.topList.refresh() //重置scroll位置
+      },
       _getTopList() {
         getTopList().then((res) => {
-          if(res.code === ERR_OK) {
-            console.log(res.data.topList)
+          if (res.code === ERR_OK) {
+            this.topList = res.data.topList;
           }
         })
       }
+    },
+    components: {
+      Scroll,
+      Loading
     }
   }
 
