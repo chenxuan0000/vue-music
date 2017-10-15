@@ -1,5 +1,5 @@
 <template>
-  <scroll class="suggest" :data="result">
+  <scroll ref="suggest" class="suggest" :data="result" :pullUp="pullUp" @scrollToEnd="searchMore">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result" @click="selectItem(item)">
         <div class="icon">
@@ -9,6 +9,7 @@
           <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <loading v-show="hasMore" title=""></loading>
     </ul>
   </scroll>
 </template>
@@ -16,20 +17,22 @@
 <script type="text/ecmascript-6">
   import {search} from 'api/search'
   import {ERR_OK} from 'api/config'
-
-  const TYPE_SINGER = 'singer'
   import {createSong} from 'common/js/song'
   import Singer from 'common/js/singer'
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {mapMutations} from 'vuex'
 
+  const TYPE_SINGER = 'singer'
   const perPage = 20
 
   export default {
     data() {
       return {
         page: 1,
-        result: []
+        result: [],
+        pullUp: true,
+        hasMore: true
       }
     },
     props: {
@@ -44,11 +47,34 @@
     },
     methods: {
       search() {
+        this.hasMore = true
+        this.page = 1
+        this.$refs.suggest.scrollTo(0,0);
         search(this.query, this.page, this.showSinger, perPage).then((res) => {
           if (res.code === ERR_OK) {
             this.result = this._genResult(res.data)
+            this._checkHasMore(res.data) //检测是否还有数据可以加载
           }
         })
+      },
+      searchMore() {
+        if (!this.hasMore) {
+          return
+        }
+        this.page++
+        search(this.query, this.page, this.showSinger, perPage).then((res) => {
+          console.log("more")
+          if (res.code === ERR_OK) {
+            this.result = this.result.concat(this._genResult(res.data))
+            this._checkHasMore(res.data) //检测是否还有数据可以加载
+          }
+        })
+      },
+      _checkHasMore(data) {
+        const song = data.song
+        if (!song.list.length || (song.curnum + song.curpage * perPage) >= song.totalnum) {
+          this.hasMore = false
+        }
       },
       selectItem(item) {
         if (item.type === TYPE_SINGER) {
@@ -107,7 +133,8 @@
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>

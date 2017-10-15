@@ -44,10 +44,17 @@
           probeType: this.probeType,
           click: this.click
         })
-        if(this.listenScroll) {
+        if (this.listenScroll) {
           let _this = this
-          this.scroll.on('scroll',(pos) => {
-            _this.$emit('scroll',pos)
+          this.scroll.on('scroll', (pos) => {
+            _this.$emit('scroll', pos)
+          })
+        }
+        if (this.pullUp) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollToEnd')
+            }
           })
         }
       },
