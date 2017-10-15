@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box ref="searchBox"></search-box>
+      <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper">
       <div class="shortcut">
@@ -15,18 +15,24 @@
         </div>
       </div>
     </div>
+    <div class="search-result" v-show="query" ref="searchResult">
+      <suggest ref="suggest" :query="query"></suggest>
+    </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import searchBox from 'base/search-box/search-box'
+  import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
 
   export default {
     data() {
       return {
-        hotKey: []
+        hotKey: [],
+        query: ''
       }
     },
     created() {
@@ -40,12 +46,16 @@
           }
         })
       },
+      onQueryChange(query) {
+        this.query = query
+      },
       addQuery(q) {
         this.$refs.searchBox.setQuery(q);
       }
     },
     components: {
-      searchBox
+      searchBox,
+      suggest
     }
   }
 </script>
