@@ -36,7 +36,7 @@ export const randomPlay = function ({commit}, {list}) {
 export const insertSong = function ({commit, state}, song) {
   let playList = state.playList.slice() //不能直接操作state playlist和sequenceList
   let sequenceList = state.sequenceList.slice()
-  let currentIndex = state.currentIndex
+  let currentIndex = state.currentIndex  //支赋值不会有问题
 
   //记录当前歌曲
   let currentSong = playList[currentIndex]

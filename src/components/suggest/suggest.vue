@@ -11,6 +11,9 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
+    <div v-show="!hasMore && !result.length" class="no-result-warpper">
+      <no-result title="抱歉,暂无搜索结果!"></no-result>
+    </div>
   </scroll>
 </template>
 
@@ -21,6 +24,7 @@
   import Singer from 'common/js/singer'
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
+  import noResult from 'base/no-result/no-result'
   import {mapMutations,mapActions} from 'vuex'
 
   const TYPE_SINGER = 'singer'
@@ -138,7 +142,8 @@
     },
     components: {
       Scroll,
-      Loading
+      Loading,
+      noResult
     }
   }
 </script>
