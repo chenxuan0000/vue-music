@@ -77,7 +77,6 @@
         }
         this.page++
         search(this.query, this.page, this.showSinger, perPage).then((res) => {
-          console.log("more")
           if (res.code === ERR_OK) {
             this.result = this.result.concat(this._genResult(res.data))
             this._checkHasMore(res.data) //检测是否还有数据可以加载

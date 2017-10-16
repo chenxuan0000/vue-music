@@ -62,7 +62,7 @@
           })
         }
         if(this.beforeScroll) {
-          this.scroll.on('beforeScroll', () => {
+          this.scroll.on('beforeScrollStart', () => {
             this.$emit('beforeScroll')
           })
         }
