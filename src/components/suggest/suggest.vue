@@ -1,5 +1,11 @@
 <template>
-  <scroll ref="suggest" class="suggest" :data="result" :pullUp="pullUp" @scrollToEnd="searchMore">
+  <scroll ref="suggest"
+          class="suggest"
+          :data="result"
+          :pullUp="pullUp"
+          :beforeScroll="beforeScroll"
+          @beforeScroll="listScroll"
+          @scrollToEnd="searchMore">
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result" @click="selectItem(item)">
         <div class="icon">
@@ -36,7 +42,8 @@
         page: 1,
         result: [],
         pullUp: true,
-        hasMore: true
+        hasMore: true,
+        beforeScroll: true
       }
     },
     props: {
@@ -60,6 +67,9 @@
             this._checkHasMore(res.data) //检测是否还有数据可以加载
           }
         })
+      },
+      listScroll() {
+        this.$emit('listScroll')
       },
       searchMore() {
         if (!this.hasMore) {
