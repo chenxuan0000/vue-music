@@ -1,6 +1,7 @@
 import * as types from './mutation-types'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
+import {saveSearch} from 'common/js/cache'
 
 function findIndex(list, song) {
   return list.findIndex((item) => {
@@ -65,11 +66,13 @@ export const insertSong = function ({commit, state}, song) {
       playList.splice(fdIndex + 1, 1)
     }
   }
-
-
   commit(types.SET_PLAYLIST, playList)
   commit(types.SET_SEQUENCE_LIST, sequenceList)
   commit(types.SET_CURRENT_INDEX, currentIndex)
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
+}
+
+export const saveSearchHistory = function ({commit},query) { //实现本地缓存和vuex数据提交
+  commit(types.SET_SEARCH_HISTORY, saveSearch(query))
 }
