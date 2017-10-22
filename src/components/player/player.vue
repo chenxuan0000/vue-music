@@ -80,7 +80,7 @@
           <img width="40" height="40" :src="currentSong.image" :class="cdCls">
         </div>
         <div class="text">
-          <h2 class="anme" v-html="currentSong.name"></h2>
+          <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
