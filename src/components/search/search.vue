@@ -91,7 +91,7 @@
         'clearSearchHistory'
       ])
     },
-    watch() {
+    watch: {
       query(newQuery) {
         if(!newQuery) {
           setTimeout(() => {
