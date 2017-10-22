@@ -4,25 +4,27 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper">
-      <div class="shortcut">
-        <div class="hot-key">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li @click="addQuery(item.k)" class="item" v-for="item in hotKey">
-              <span>{{item.k}}</span>
-            </li>
-          </ul>
-        </div>
-        <div class="search-history" v-show="searchHistory.length">
-          <h1 class="title">
-            <span class="text">搜索历史</span>
-            <span @click="showConfirm" class="clear">
+      <Scroll class="shortcut" :data="shortcut">
+        <div>
+          <div class="hot-key">
+            <h1 class="title">热门搜索</h1>
+            <ul>
+              <li @click="addQuery(item.k)" class="item" v-for="item in hotKey">
+                <span>{{item.k}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="search-history" v-show="searchHistory.length">
+            <h1 class="title">
+              <span class="text">搜索历史</span>
+              <span @click="showConfirm" class="clear">
                 <i class="icon-clear"></i>
               </span>
-          </h1>
-          <search-list @select="addQuery" @delete="deleteSearchHistory" :searches="searchHistory"></search-list>
+            </h1>
+            <search-list @select="addQuery" @delete="deleteSearchHistory" :searches="searchHistory"></search-list>
+          </div>
         </div>
-      </div>
+      </Scroll>
     </div>
     <div class="search-result" v-show="query" ref="searchResult">
       <suggest @select="saveSearch" ref="suggest" @listScroll="blurInput" :query="query"></suggest>
@@ -36,10 +38,11 @@
   import searchBox from 'base/search-box/search-box'
   import searchList from 'base/search-list/search-list'
   import confirm from 'base/confirm/confirm'
+  import Scroll from 'base/scroll/scroll'
   import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
-  import {mapActions,mapGetters} from 'vuex'
+  import {mapActions, mapGetters} from 'vuex'
 
   export default {
     data() {
@@ -49,6 +52,9 @@
       }
     },
     computed: {
+      shortcut() {
+        return this.hotKey.concat(this.searchHistory)
+      },
       ...mapGetters([
         'searchHistory'
       ])
@@ -89,7 +95,8 @@
       searchBox,
       suggest,
       searchList,
-      confirm
+      confirm,
+      Scroll
     }
   }
 </script>
