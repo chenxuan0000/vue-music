@@ -43,8 +43,10 @@
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
   import {mapActions, mapGetters} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         hotKey: [],
@@ -69,6 +71,13 @@
             this.hotKey = res.data.hotkey.slice(0, 10)
           }
         })
+      },
+      handlePlaylist(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.shortcut.refresh() //重置scroll位置
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.suggest.refresh() //重置scroll位置
       },
       onQueryChange(query) {
         this.query = query
