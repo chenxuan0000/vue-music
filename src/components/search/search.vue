@@ -4,7 +4,7 @@
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
     <div ref="shortcutWrapper" class="shortcut-wrapper">
-      <Scroll class="shortcut" :data="shortcut">
+      <Scroll ref="shortcut" class="shortcut" :data="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -90,6 +90,15 @@
         'deleteSearchHistory',
         'clearSearchHistory'
       ])
+    },
+    watch() {
+      query(newQuery) {
+        if(!newQuery) {
+          setTimeout(() => {
+            this.$refs.shortcut.refresh()
+          },20)
+        }
+      }
     },
     components: {
       searchBox,
