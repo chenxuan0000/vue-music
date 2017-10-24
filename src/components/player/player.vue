@@ -88,11 +88,12 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <play-list ref="playList"></play-list>
     <audio ref="audio" :src="currentSong.url"
            @ended="end" @play="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
@@ -103,6 +104,7 @@
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import progressBar from 'base/progress-bar/progress-bar'
+  import playList from 'components/playlist/playlist'
   import progressCircle from 'base/progress-circle/progress-circle'
   import {playMode} from 'common/js/config'
   import {shuffle} from 'common/js/util'
@@ -156,6 +158,9 @@
       ])
     },
     methods: {
+      showPlayList() {
+        this.$refs.playList.show()
+      },
       back() {
         this.setFullScreen(false)
       },
@@ -453,7 +458,8 @@
     components: {
       progressBar,
       progressCircle,
-      Scroll
+      Scroll,
+      playList
     }
   }
 
