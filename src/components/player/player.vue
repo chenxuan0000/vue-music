@@ -437,6 +437,10 @@
     },
     watch: {
       currentSong(newSong, oldSong) {
+        console.log(this.playList)
+        if(!newSong.id) {
+          return
+        }
         if (newSong.id === oldSong.id) {
           return
         }

@@ -17,7 +17,7 @@
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete" @click="deleteOne">
+              <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
@@ -38,7 +38,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import {playMode} from 'common/js/config'
   import scroll from 'base/scroll/scroll'
 
@@ -88,11 +88,17 @@
         this.$refs.listContent.scrollToElement(this.$refs.liContent[index], 300)
       },
       deleteOne (item) {
-
+        this.deleteSong(item)
+        if(!this.playList.length) {
+          this.hide()
+        }
       },
       ...mapMutations({
         setCurrentIndex: 'SET_CURRENT_INDEX'
-      })
+      }),
+      ...mapActions([
+        'deleteSong'
+      ])
     },
     watch: {
       currentSong (newSong, oldSong) {
@@ -101,7 +107,7 @@
         }
         setTimeout(() => {
           this.scrollToCurrent(newSong)
-        },20)
+        }, 20)
       }
     },
     components: {
