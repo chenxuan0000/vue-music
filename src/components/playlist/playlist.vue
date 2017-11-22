@@ -6,12 +6,12 @@
           <h1 class="title">
             <i class="icon"></i>
             <span class="text"></span>
-            <span class="clear"><i class="icon-clear"></i></span>
+            <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
         <scroll :data="sequenceList" ref="listContent" class="list-content">
-          <ul>
-            <li class="item" v-for="(item,index) in sequenceList" @click="selectItem(item,index)" ref="liContent">
+          <transition-group tag="ul" ref="list" name="list">
+            <li :key="item.id" class="item" v-for="(item,index) in sequenceList" @click="selectItem(item,index)">
               <i class="current" :class="getNowIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
@@ -21,7 +21,7 @@
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
+          </transition-group>
         </scroll>
         <div class="list-operate">
           <div class="add">
@@ -33,6 +33,7 @@
           <span>关闭</span>
         </div>
       </div>
+      <confirm ref="confirm" @confirm="confirmClear" text="是否清空播放列表" confirmBtnText="清空"></confirm>
     </div>
   </transition>
 </template>
@@ -40,6 +41,7 @@
 <script type="text/ecmascript-6">
   import {mapGetters, mapMutations, mapActions} from 'vuex'
   import {playMode} from 'common/js/config'
+  import Confirm from 'base/confirm/confirm'
   import scroll from 'base/scroll/scroll'
 
   export default {
@@ -67,6 +69,9 @@
       hide () {
         this.showFalg = false
       },
+      showConfirm() {
+        this.$refs.confirm.show()
+      },
       selectItem (item, index) {
         if (this.mode === playMode.random) {
           index = this.playList.findIndex((song) => {
@@ -81,15 +86,19 @@
         }
         return ''
       },
+      confirmClear () {
+        this.deleteSongList()
+        this.hide()
+      },
       scrollToCurrent (cur) {
         const index = this.sequenceList.findIndex((song) => {
           return song.id === cur.id
         })
-        this.$refs.listContent.scrollToElement(this.$refs.liContent[index], 300)
+        this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
       },
       deleteOne (item) {
         this.deleteSong(item)
-        if(!this.playList.length) {
+        if (!this.playList.length) {
           this.hide()
         }
       },
@@ -97,7 +106,8 @@
         setCurrentIndex: 'SET_CURRENT_INDEX'
       }),
       ...mapActions([
-        'deleteSong'
+        'deleteSong',
+        'deleteSongList'
       ])
     },
     watch: {
@@ -111,7 +121,8 @@
       }
     },
     components: {
-      scroll
+      scroll,
+      Confirm
     }
   }
 </script>
