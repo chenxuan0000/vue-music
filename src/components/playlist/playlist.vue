@@ -24,7 +24,7 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -34,6 +34,7 @@
         </div>
       </div>
       <confirm ref="confirm" @confirm="confirmClear" text="是否清空播放列表" confirmBtnText="清空"></confirm>
+      <add-song ref="addSong"></add-song>
     </div>
   </transition>
 </template>
@@ -43,6 +44,7 @@
   import {playMode} from 'common/js/config'
   import Confirm from 'base/confirm/confirm'
   import scroll from 'base/scroll/scroll'
+  import addSong from 'components/add-song/add-song'
   import {playerMixin} from 'common/js/mixin'
 
   export default {
@@ -53,7 +55,7 @@
       }
     },
     computed: {
-      modeText() {
+      modeText () {
         return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
       }
     },
@@ -68,7 +70,10 @@
       hide () {
         this.showFalg = false
       },
-      showConfirm() {
+      addSong () {
+        this.$refs.addSong.show()
+      },
+      showConfirm () {
         this.$refs.confirm.show()
       },
       selectItem (item, index) {
@@ -119,7 +124,8 @@
     },
     components: {
       scroll,
-      Confirm
+      Confirm,
+      addSong
     }
   }
 </script>
