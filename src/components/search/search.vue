@@ -42,70 +42,52 @@
   import suggest from 'components/suggest/suggest'
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
-  import {mapActions, mapGetters} from 'vuex'
-  import {playlistMixin} from 'common/js/mixin'
+  import {mapActions} from 'vuex'
+  import {playlistMixin, searchMixin} from 'common/js/mixin'
 
   export default {
-    mixins: [playlistMixin],
-    data() {
+    mixins: [playlistMixin, searchMixin],
+    data () {
       return {
-        hotKey: [],
-        query: ''
+        hotKey: []
       }
     },
     computed: {
-      shortcut() {
+      shortcut () {
         return this.hotKey.concat(this.searchHistory)
-      },
-      ...mapGetters([
-        'searchHistory'
-      ])
+      }
     },
-    created() {
+    created () {
       this._getHotKey();
     },
     methods: {
-      _getHotKey() {
+      _getHotKey () {
         getHotKey().then((res) => {
           if (res.code === ERR_OK) {
             this.hotKey = res.data.hotkey.slice(0, 10)
           }
         })
       },
-      handlePlaylist(playList) {
+      handlePlaylist (playList) {
         const bottom = playList.length > 0 ? '60px' : ''
         this.$refs.shortcutWrapper.style.bottom = bottom
         this.$refs.shortcut.refresh() //重置scroll位置
         this.$refs.searchResult.style.bottom = bottom
         this.$refs.suggest.refresh() //重置scroll位置
       },
-      onQueryChange(query) {
-        this.query = query
-      },
-      addQuery(q) {
-        this.$refs.searchBox.setQuery(q)
-      },
-      showConfirm() {
+      showConfirm () {
         this.$refs.confirm.show();
       },
-      blurInput() {
-        this.$refs.searchBox.blur()
-      },
-      saveSearch(item) {
-        this.saveSearchHistory(this.query)
-      },
       ...mapActions([
-        'saveSearchHistory',
-        'deleteSearchHistory',
         'clearSearchHistory'
       ])
     },
     watch: {
-      query(newQuery) {
-        if(!newQuery) {
+      query (newQuery) {
+        if (!newQuery) {
           setTimeout(() => {
             this.$refs.shortcut.refresh()
-          },20)
+          }, 20)
         }
       }
     },
