@@ -52,7 +52,7 @@
     data () {
       return {
         showFalg: false,
-        refreshDelay: 120
+        refreshDelay: 140
       }
     },
     computed: {
