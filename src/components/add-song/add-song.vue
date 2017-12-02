@@ -13,12 +13,14 @@
       <div class="shortcut" v-show="!query">
         <switches :currentIndex="currentIndex" :switches="switches" @switch="switchItem"></switches>
         <div class="list-wrapper">
-          <scroll v-if="currentIndex === 0" :date="playHistory" class="list-scroll" ref="playList">
+          <scroll v-if="currentIndex === 0" :date="playHistory" class="list-scroll"
+                  ref="playList">
             <div class="list-inner">
               <song-list :songs="playHistory" @select="selectSong"></song-list>
             </div>
           </scroll>
-          <scroll v-if="currentIndex === 1" :date="searchHistory" class="list-scroll" ref="searchList">
+          <scroll :refreshDelay="refreshDelay" v-if="currentIndex === 1" :date="searchHistory" class="list-scroll"
+                  ref="searchList">
             <div class="list-inner">
               <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list>
             </div>
@@ -88,10 +90,10 @@
       },
       switchItem (index) {
         this.currentIndex = index
-        this.$refs.topTip.show()
       },
       selectSuggest () {
         this.saveSearch()
+        this.$refs.topTip.show()
       },
       selectSong (song, index) {
         if (index !== 0) {
