@@ -19,7 +19,8 @@
       MHeader,
       Tab,
       Player
-    }
+    },
+    created() {}
   }
 </script>
 
