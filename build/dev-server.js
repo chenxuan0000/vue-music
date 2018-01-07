@@ -2,9 +2,9 @@ require('./check-versions')()
 var axios = require('axios')
 
 var config = require('../config')
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
-}
+// if (!process.env.NODE_ENV) {
+//   process.env.NODE_ENV = JSON.parse(config.dev.env.NODE_ENV)
+// }
 
 var opn = require('opn')
 var path = require('path')
