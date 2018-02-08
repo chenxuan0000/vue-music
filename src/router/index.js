@@ -10,7 +10,6 @@ import Router from 'vue-router'
 // import User from 'components/user-center/user-center'
 
 Vue.use(Router)
-<<<<<<< HEAD
 // const Recommend = r => require.ensure([], () => r(require('@/components/recommend/recommend')), 'Recommend');
 // const Singer = r => require.ensure([], () => r(require('@/components/singer/singer')), 'Singer');
 // const Rank = r => require.ensure([], () => r(require('@/components/rank/rank')), 'Rank');
@@ -27,16 +26,6 @@ const SingerDetail = () => import('components/singer-detail/singer-detail')
 const topList = () => import('components/top-list/top-list')
 const Disc = () => import('components/disc/disc')
 const User = () => import('components/user-center/user-center')
-=======
-const Recommend = r => require.ensure([], () => r(require('@/components/recommend/recommend')), 'Recommend');
-const Singer = r => require.ensure([], () => r(require('@/components/singer/singer')), 'Singer');
-const Rank = r => require.ensure([], () => r(require('@/components/rank/rank')), 'Rank');
-const Search = r => require.ensure([], () => r(require('@/components/search/search')), 'Search');
-const SingerDetail = r => require.ensure([], () => r(require('@/components/singer-detail/singer-detail')), 'SingerDetail');
-const topList = r => require.ensure([], () => r(require('@/components/top-list/top-list')), 'topList');
-const Disc = r => require.ensure([], () => r(require('@/components/disc/disc')), 'Disc');
-const User = r => require.ensure([], () => r(require('@/components/user-center/user-center')), 'Search');
->>>>>>> 8425f5a4aa6f38cfe1a99d7965706d5588ebb5a4
 
 
 export default new Router({
